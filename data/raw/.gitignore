@@ -1,0 +1,5 @@
+# Ignore Yelp dataset files (too large for git)
+*.json
+
+# Keep the directory structure
+!.gitkeep

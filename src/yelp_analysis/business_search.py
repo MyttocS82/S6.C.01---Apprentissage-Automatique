@@ -2,7 +2,7 @@
 Business search and filtering functionality for Yelp dataset
 """
 import pandas as pd
-from typing import List, Optional
+from typing import Optional
 
 
 class BusinessSearch:
@@ -30,10 +30,13 @@ class BusinessSearch:
         Returns:
             DataFrame of matching businesses
         """
+        if 'name' not in self.businesses.columns:
+            return pd.DataFrame()
+        
         if not case_sensitive:
-            mask = self.businesses['name'].str.contains(query, case=False, na=False)
+            mask = self.businesses['name'].str.contains(query, case=False, na=False, regex=False)
         else:
-            mask = self.businesses['name'].str.contains(query, na=False)
+            mask = self.businesses['name'].str.contains(query, na=False, regex=False)
         
         return self.businesses[mask]
     
@@ -50,7 +53,7 @@ class BusinessSearch:
         if 'categories' not in self.businesses.columns:
             return pd.DataFrame()
         
-        mask = self.businesses['categories'].str.contains(category, case=False, na=False)
+        mask = self.businesses['categories'].str.contains(category, case=False, na=False, regex=False)
         return self.businesses[mask]
     
     def filter_by_rating(self, min_stars: float = 1.0, max_stars: float = 5.0) -> pd.DataFrame:
@@ -66,6 +69,14 @@ class BusinessSearch:
         """
         if 'stars' not in self.businesses.columns:
             return pd.DataFrame()
+        
+        # Validate rating range
+        if not (1.0 <= min_stars <= 5.0):
+            raise ValueError(f"min_stars must be between 1.0 and 5.0, got {min_stars}")
+        if not (1.0 <= max_stars <= 5.0):
+            raise ValueError(f"max_stars must be between 1.0 and 5.0, got {max_stars}")
+        if min_stars > max_stars:
+            raise ValueError(f"min_stars ({min_stars}) cannot be greater than max_stars ({max_stars})")
         
         mask = (self.businesses['stars'] >= min_stars) & (self.businesses['stars'] <= max_stars)
         return self.businesses[mask]
@@ -96,12 +107,15 @@ class BusinessSearch:
         Get top-rated businesses
         
         Args:
-            n: Number of top businesses to return
+            n: Number of top businesses to return (must be positive)
             category: Optional category filter
             
         Returns:
             DataFrame of top-rated businesses
         """
+        if n <= 0:
+            raise ValueError(f"n must be positive, got {n}")
+        
         result = self.businesses
         
         if category:

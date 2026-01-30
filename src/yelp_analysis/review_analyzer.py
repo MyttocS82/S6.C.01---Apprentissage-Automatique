@@ -2,9 +2,7 @@
 Review analysis utilities for Yelp dataset
 """
 import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from collections import Counter
+from typing import Dict
 
 
 class ReviewAnalyzer:
@@ -58,6 +56,10 @@ class ReviewAnalyzer:
         if 'stars' not in self.reviews.columns:
             return pd.DataFrame()
         
+        # Validate rating is in valid range
+        if not (1 <= stars <= 5):
+            raise ValueError(f"Rating must be between 1 and 5, got {stars}")
+        
         return self.reviews[self.reviews['stars'] == stars]
     
     def get_reviews_by_business(self, business_id: str) -> pd.DataFrame:
@@ -100,7 +102,8 @@ class ReviewAnalyzer:
         if 'text' not in self.reviews.columns:
             return {}
         
-        lengths = self.reviews['text'].str.len()
+        # Drop NaN values before computing lengths
+        lengths = self.reviews['text'].dropna().str.len()
         
         return {
             'mean': lengths.mean(),
@@ -115,11 +118,14 @@ class ReviewAnalyzer:
         Get most useful reviews (by useful votes)
         
         Args:
-            n: Number of reviews to return
+            n: Number of reviews to return (must be positive)
             
         Returns:
             DataFrame of most useful reviews
         """
+        if n <= 0:
+            raise ValueError(f"n must be positive, got {n}")
+        
         if 'useful' not in self.reviews.columns:
             return pd.DataFrame()
         

@@ -60,24 +60,38 @@ plt.scatter(business_review_stats['review_count'], business_review_stats['averag
 plt.title('Lien entre le nombre total d’avis d’un business et la note moyenne du business')
 plt.xlabel('Nombre total d\'avis')
 plt.ylabel('Note moyenne du business')
-plt.xscale('log')       # Voir si on garde le log ou pas !
+plt.xscale('log')  # Voir si on garde le log ou pas !
 plt.yscale('linear')
-plt.savefig("../../results/figures/Lien entre le nombre total d’avis d’un business et la note moyenne du business.png", dpi=500)
+plt.savefig("../../results/figures/Lien entre le nombre total d’avis d’un business et la note moyenne du business.png",
+            dpi=500)
 plt.show()
 
 # Visualisation 5 : notes par rapports aux nombres d'avis des utilisateurs
 user_review_stats = reviews.groupby('user_id').agg({'stars': ['mean', 'count']})
 user_review_stats.columns = ['average_stars', 'review_count']
 plt.scatter(user_review_stats['review_count'], user_review_stats['average_stars'], alpha=0.5, color='orange')
-plt.title('Notes par rapports aux nombres d\'avis des utilisateurs')
+plt.title('Notes moyenne par rapport aux nombres d\'avis des utilisateurs')
 plt.xlabel('Nombre total d\'avis par utilisateur')
 plt.ylabel('Note moyenne par utilisateur')
-plt.xscale('log')       # Voir si on garde le log ou pas !
+plt.xscale('log')  # Voir si on garde le log ou pas !
 plt.yscale('linear')
 plt.savefig("../../results/figures/Notes par rapports aux nombres d'avis des utilisateurs.png", dpi=500)
 plt.show()
 
 # Visualisation 6 : TODO (Est-ce que les utilisateurs expérimentés, ont tendance à faire des reviews plus détaillées ?)
+#                       equivalent à tous les users ayant la colonne 'elite' non vide
+#                      ('elite' : années où l'utilisateur est considéré comme expérimenté)
+experienced_users = users[users['elite'].str.len() > 0]['user_id']
+experienced_reviews = reviews[reviews['user_id'].isin(experienced_users)]
+experienced_reviews_lengths = experienced_reviews['text_length']
+all_reviews_lengths = reviews['text_length']
+
+plt.boxplot([all_reviews_lengths, experienced_reviews_lengths],
+            tick_labels=['Tous les utilisateurs', 'Utilisateurs expérimentés'])
+plt.title('Longueur des avis : Utilisateurs expérimentés vs Tous les utilisateurs')
+plt.ylabel('Longueur de l\'avis (nombre de caractères)')
+plt.savefig("../../results/figures/Longueur des avis Utilisateurs expérimentés vs Tous les utilisateurs.png", dpi=500)
+plt.show()
 
 # Visualisation 7 : longueur moyenne des reviews par classe de note
 average_length_by_stars = reviews.groupby('stars')['text_length'].mean()

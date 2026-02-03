@@ -33,16 +33,19 @@ def load_yelp_datasets(path_directory: Path) -> tuple[DataFrame, DataFrame, Data
     return business_dataset, user_dataset, reviews_dataset
 
 
-def write_dataframe_to_csv(dataframe: DataFrame, output_path: Path) -> None:
+def write_dataframe_to_csv(dataframe: DataFrame, output_path: Path, filename: str) -> None:
     """
     Write a DataFrame to a CSV file at the specified output path.
     :param dataframe: The DataFrame to write.
     :param output_path: The path where the CSV file will be saved.
+    :param filename:  The name of the output CSV file.
+    :return: None
+    Raises FileNotFoundError if the output path does not exist.
     """
     try:
         if not output_path.exists():
             raise FileNotFoundError("The folder does not exist.")
-        dataframe.to_csv(output_path, index=False)
+        dataframe.to_csv(output_path / filename, index=False)
     except Exception as e:
         print(f"An error occurred while writing the DataFrame to CSV: {e}")
 

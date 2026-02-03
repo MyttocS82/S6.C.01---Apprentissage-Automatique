@@ -8,7 +8,7 @@ processed_data_folder = Path("../../data/processed")
 
 buisness, users, reviews = load_yelp_datasets(raw_data_folder)
 
-def label_review(stars: int) -> int:
+def create_label_review(stars: int) -> int:
     """
     Label the review based on the star rating.
     :param stars:
@@ -21,7 +21,15 @@ def label_review(stars: int) -> int:
     else:
         return 0
 
-# Preprocessing Business DataFrame TODO
+'''
+Preprocessing Business DataFrame
+'''
+# Drop les colonnes inutiles        (garder 'categories' ?)
+buisness = buisness.drop(columns=['business_id', 'address', 'state', 'postal_code', 'latitude',
+                                  'longitude', 'attributes', 'hours'])
+
+print(buisness.info())
+
 
 '''
 Preprocessing Users DataFrame TODO
@@ -31,12 +39,10 @@ Preprocessing Users DataFrame TODO
 '''
 Preprocessing Reviews DataFrame
 '''
-print(reviews.info())
-
 # Drop les colonnes inutiles
 reviews = reviews.drop(columns=['user_id', 'business_id', 'review_id', 'date'])
 
 # Création des labels pour le sentiment : score > 3 → positif // score < 3 → négatif // score = 3 → neutre
 #   et création d'une colonne 'rating' (eq à stars)
-reviews['sentiment'] = reviews['stars'].apply(label_review)
+reviews['sentiment'] = reviews['stars'].apply(create_label_review)
 reviews['rating'] = reviews['stars']

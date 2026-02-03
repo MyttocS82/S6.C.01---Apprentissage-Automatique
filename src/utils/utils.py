@@ -23,3 +23,14 @@ def create_sentiment_and_rating_columns(df: DataFrame) -> None:
     """
     df['sentiment'] = df['stars'].apply(create_label_review)
     df['rating'] = df['stars']
+
+
+def count_number_elements(element: str) -> int:
+    """
+    Count the number of elements in a comma-separated string.
+    :param element: String containing elements separated by commas
+    :return: Number of elements
+    """
+    if isinstance(element, str) and element.strip() != '':
+        return len(element.split(','))
+    return 0

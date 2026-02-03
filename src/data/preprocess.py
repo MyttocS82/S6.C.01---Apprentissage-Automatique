@@ -3,9 +3,9 @@ from src.utils.utils import create_sentiment_and_rating_columns, count_number_el
 from pathlib import Path
 import pandas as pd
 
-raw_data_folder = Path("../../data/raw")
-processed_data_folder = Path("../../data/processed")
-ml_data_folder = Path("../../data/ml")
+RAW_DATA_FOLDER = Path("../../data/raw")
+PROCESSED_DATA_FOLDER = Path("../../data/processed")
+ML_DATA_FOLDER = Path("../../data/ml")
 
 
 def preprocess_datasets():
@@ -14,7 +14,7 @@ def preprocess_datasets():
     :return: None
     """
     # Loading raw datasets
-    business, users, reviews = load_yelp_datasets(raw_data_folder)
+    business, users, reviews = load_yelp_datasets(RAW_DATA_FOLDER)
 
     """
     Preprocessing des datasets brutes en datasets légèrement pré-traités
@@ -51,9 +51,9 @@ def preprocess_datasets():
     create_sentiment_and_rating_columns(reviews)
 
     ''' Écriture des DataFrames préprocessés dans des fichiers CSV '''
-    write_dataframe_to_csv(business, processed_data_folder, 'processed_business.csv')
-    write_dataframe_to_csv(users, processed_data_folder, 'processed_users.csv')
-    write_dataframe_to_csv(reviews, processed_data_folder, 'processed_reviews.csv')
+    write_dataframe_to_csv(business, PROCESSED_DATA_FOLDER, 'processed_business.csv')
+    write_dataframe_to_csv(users, PROCESSED_DATA_FOLDER, 'processed_users.csv')
+    write_dataframe_to_csv(reviews, PROCESSED_DATA_FOLDER, 'processed_reviews.csv')
 
 
 def ml_datasets():
@@ -62,7 +62,7 @@ def ml_datasets():
     :return: None
     """
     # Loading processed datasets
-    processed_reviews = load_processed_datasets(processed_data_folder, "processed_reviews.csv")
+    processed_reviews = load_processed_datasets(PROCESSED_DATA_FOLDER, "processed_reviews.csv")
 
     ''' Dataset reviews pour le Machine Learning '''
     processed_reviews.drop(columns=['business_id', 'review_id', 'user_id', 'stars', 'useful',
@@ -72,8 +72,8 @@ def ml_datasets():
     dataset_rating = processed_reviews.copy().drop(columns=['sentiment'])
 
     ''' Écriture des DataFrames pour le ML dans des fichiers CSV '''
-    write_dataframe_to_csv(dataset_sentiment, ml_data_folder, 'ml_reviews_sentiment.csv')
-    write_dataframe_to_csv(dataset_rating, ml_data_folder, 'ml_reviews_rating.csv')
+    write_dataframe_to_csv(dataset_sentiment, ML_DATA_FOLDER, 'ml_reviews_sentiment.csv')
+    write_dataframe_to_csv(dataset_rating, ML_DATA_FOLDER, 'ml_reviews_rating.csv')
 
 
 if __name__ == "__main__":

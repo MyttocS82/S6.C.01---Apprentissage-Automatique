@@ -6,11 +6,11 @@ from src.data.load_data import load_ml_datasets
 from pathlib import Path
 import joblib
 
-ml_data_folder = Path("../../data/ml")
-models_folder = Path("../../models")
+ML_DATA_FOLDER = Path("../../data/ml")
+MODELS_FOLDER = Path("../../models")
 
 # Chargement des données
-df_sentiment = load_ml_datasets(ml_data_folder, "ml_reviews_sentiment.csv")
+df_sentiment = load_ml_datasets(ML_DATA_FOLDER, "ml_reviews_sentiment.csv")
 
 X = df_sentiment["text"]
 y = df_sentiment["sentiment"]
@@ -28,8 +28,8 @@ model = LogisticRegression(max_iter=2500)
 model.fit(X_train_tfidf, y_train)
 
 # Sauvegarde du modèle et du vectorizer
-joblib.dump(model, models_folder / 'model_sentiment.pkl')
-joblib.dump(vectorizer, models_folder / 'vectorizer_sentiment.pkl')
+joblib.dump(model, MODELS_FOLDER / 'model_sentiment.pkl')
+joblib.dump(vectorizer, MODELS_FOLDER / 'vectorizer_sentiment.pkl')
 
 '''
 # Prédiction

@@ -217,7 +217,7 @@ data/interim/
 data/processed/
 
 # Modèles entraînés
-models/
+/models/
 *.pkl
 *.joblib
 *.h5

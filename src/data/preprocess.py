@@ -62,7 +62,7 @@ def ml_datasets():
     :return: None
     """
     # Loading processed datasets
-    processed_reviews = load_processed_datasets(processed_data_folder)
+    processed_reviews = load_processed_datasets(processed_data_folder, "processed_reviews.csv")
 
     ''' Dataset reviews pour le Machine Learning '''
     processed_reviews.drop(columns=['business_id', 'review_id', 'user_id', 'stars', 'useful',

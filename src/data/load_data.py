@@ -50,20 +50,41 @@ def write_dataframe_to_csv(dataframe: DataFrame, output_path: Path, filename: st
         print(f"An error occurred while writing the DataFrame to CSV: {e}")
 
 
-def load_processed_datasets(path_directory: Path) -> DataFrame:
+def load_processed_datasets(path_directory: Path, filename: str) -> DataFrame:
     """
     Load processed Yelp datasets from the specified directory.
     :param path_directory:
+    :param filename:
     :return: A DataFrame containing the processed reviews dataset.
     Raises FileNotFoundError if the required file is missing.
     """
     processed_reviews_dataset = None
 
     for file in path_directory.iterdir():
-        if file.name == "processed_reviews.csv":
+        if file.name == filename:
             processed_reviews_dataset = pd.read_csv(file)
 
     if processed_reviews_dataset is None:
         raise FileNotFoundError("One or more required processed Yelp dataset files are missing.")
 
     return processed_reviews_dataset
+
+
+def load_ml_datasets(path_directory: Path, filename: str) -> DataFrame:
+    """
+    Load machine learning datasets from the specified directory.
+    :param path_directory:
+    :param filename:
+    :return: A DataFrame containing the specified machine learning dataset.
+    Raises FileNotFoundError if the required file is missing.
+    """
+    ml_dataset = None
+
+    for file in path_directory.iterdir():
+        if file.name == filename:
+            ml_dataset = pd.read_csv(file)
+
+    if ml_dataset is None:
+        raise FileNotFoundError(f"The required machine learning dataset file '{filename}' is missing.")
+
+    return ml_dataset

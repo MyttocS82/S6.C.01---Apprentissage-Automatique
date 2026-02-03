@@ -213,7 +213,7 @@ __marimo__/
 
 # Datasets (volumineux / non versionnés)
 data/raw/
-data/interim/
+data/ml/
 data/processed/
 
 # Modèles entraînés

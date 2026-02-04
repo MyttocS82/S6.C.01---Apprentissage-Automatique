@@ -6,10 +6,10 @@ from src.data.load_data import load_ml_datasets
 from pathlib import Path
 import joblib
 
-ML_DATA_FOLDER = Path("../../data/ml")
-MODELS_FOLDER = Path("../../models")
+ML_DATA_FOLDER = Path("../../../data/ml")
+MODELS_FOLDER = Path("../../../models")
 
-def train_rating_model():
+def tfidf_logisticregression_rating():
     # Chargement des données
     df_sentiment = load_ml_datasets(ML_DATA_FOLDER, "ml_reviews_rating.csv")
 
@@ -50,4 +50,4 @@ def train_rating_model():
     '''
 
 if __name__ == "__main__":
-    train_rating_model()
+    tfidf_logisticregression_rating()

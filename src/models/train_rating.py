@@ -1,4 +1,4 @@
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+# from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -32,6 +32,7 @@ joblib.dump(model, MODELS_FOLDER / 'model_rating.pkl')
 joblib.dump(vectorizer, MODELS_FOLDER / 'vectorizer_rating.pkl')
 
 
+'''
 # Prédiction
 y_test_pred = model.predict(X_test_tfidf)
 
@@ -45,4 +46,4 @@ print("Accuracy : ", test_accuracy)
 print("Precision : ", test_precision)
 print("Recall : ", test_recall)
 print("F1-score : ", test_f1)
-
+'''

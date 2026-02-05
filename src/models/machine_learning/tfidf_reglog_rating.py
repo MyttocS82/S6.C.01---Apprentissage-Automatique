@@ -30,8 +30,8 @@ def tfidf_logisticregression_rating(print_eval: bool = False) -> None:
     model.fit(X_train_tfidf, y_train)
 
     # Sauvegarde du modèle et du vectorizer
-    joblib.dump(model, MODELS_FOLDER / 'model_rating.pkl')
-    joblib.dump(vectorizer, MODELS_FOLDER / 'vectorizer_rating.pkl')
+    joblib.dump(model, MODELS_FOLDER / 'model_reglog_rating.pkl')
+    joblib.dump(vectorizer, MODELS_FOLDER / 'vectorizer_reglog_rating.pkl')
 
     if print_eval:
         # Prédiction

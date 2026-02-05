@@ -1,7 +1,7 @@
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
 from src.data.load_data import load_ml_datasets
 from pathlib import Path
 import joblib
@@ -10,7 +10,7 @@ ML_DATA_FOLDER = Path("../../../data/ml")
 MODELS_FOLDER = Path("../../../models")
 
 
-def tfidf_logisticregression_sentiment(print_eval: bool = False) -> None:
+def tfidf_svm_sentiment(print_eval: bool = False) -> None:
     # Chargement des données
     df_sentiment = load_ml_datasets(ML_DATA_FOLDER, "ml_reviews_sentiment.csv")
 
@@ -26,12 +26,12 @@ def tfidf_logisticregression_sentiment(print_eval: bool = False) -> None:
     X_test_tfidf = vectorizer.transform(X_test)
 
     # Regression logistique
-    model = LogisticRegression(max_iter=2500)
+    model = LinearSVC(C=1.0, max_iter=2500)
     model.fit(X_train_tfidf, y_train)
 
     # Sauvegarde du modèle et du vectorizer
-    joblib.dump(model, MODELS_FOLDER / 'model_reglog_sentiment.pkl')
-    joblib.dump(vectorizer, MODELS_FOLDER / 'vectorizer_reglog_sentiment.pkl')
+    joblib.dump(model, MODELS_FOLDER / 'model_svc_sentiment.pkl')
+    joblib.dump(vectorizer, MODELS_FOLDER / 'vectorizer_svc_sentiment.pkl')
 
     if print_eval:
         # Prédiction
@@ -43,12 +43,12 @@ def tfidf_logisticregression_sentiment(print_eval: bool = False) -> None:
         test_recall = recall_score(y_test, y_test_pred, average='weighted', zero_division=0)
         test_f1 = f1_score(y_test, y_test_pred, average='weighted', zero_division=0)
 
-        print("\nÉvaluation du modèle TF-IDF + Régression Logistique pour la prédiction des sentiments :")
-        print("Accuracy (TF-IDF Reg.Log) sentiment : ", test_accuracy)
-        print("Precision (TF-IDF Reg.Log) sentiment : ", test_precision)
-        print("Recall (TF-IDF Reg.Log) sentiment : ", test_recall)
-        print("F1-score (TF-IDF Reg.Log) sentiment : ", test_f1, "\n")
+        print("\nÉvaluation du modèle TF-IDF + SVC pour la prédiction des sentiments :")
+        print("Accuracy (TF-IDF SVC) sentiment : ", test_accuracy)
+        print("Precision (TF-IDF SVC) sentiment : ", test_precision)
+        print("Recall (TF-IDF SVC) sentiment : ", test_recall)
+        print("F1-score (TF-IDF SVC) sentiment : ", test_f1, "\n")
 
 
 if __name__ == "__main__":
-    tfidf_logisticregression_sentiment(print_eval=False)
+    tfidf_svm_sentiment(print_eval=False)

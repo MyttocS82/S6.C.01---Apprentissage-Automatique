@@ -96,9 +96,12 @@ def list_models() -> list[str]:
     entries = []
     for name in sorted(os.listdir(MODELS_DIR)):
         full = os.path.join(MODELS_DIR, name)
+        # Exclure les vectorizers de la liste des modèles
+        if name.startswith("vectorizer_"):
+            continue
         if os.path.isfile(full) and name.endswith((".pkl", ".keras", ".h5")):
             entries.append(name)
-        elif os.path.isdir(full) and not name.endswith("_tokenizer"):
+        elif os.path.isdir(full) and not name.endswith("_tokenizer") and not name.endswith("_model_tokenizer"):
             entries.append(f"{name}/  (BERT)")
     return entries
 
@@ -113,7 +116,7 @@ def load_model(model_name: str):
     if model_name.endswith(".keras") or model_name.endswith(".h5"):
         import tensorflow as tf
         import keras
-        # Enregistrement de la fonction custom pour la désérialisation
+
         @keras.saving.register_keras_serializable()
         def custom_standardization_registered(input_data):
             lowercase = tf.strings.lower(input_data)
@@ -128,10 +131,40 @@ def load_model(model_name: str):
 
     if os.path.isdir(path):
         from transformers import TFAutoModelForSequenceClassification, AutoTokenizer
+
         model = TFAutoModelForSequenceClassification.from_pretrained(path)
-        tokenizer = AutoTokenizer.from_pretrained(
-            os.path.join(MODELS_DIR, f"{model_name}_tokenizer")
-        )
+
+        # Détection du type : rating ou sentiment
+        if "rating" in model_name:
+            tokenizer_folder = "bert_rating_model_tokenizer"
+        elif "sentiment" in model_name:
+            tokenizer_folder = "bert_sentiment_model_tokenizer"
+        else:
+            tokenizer_folder = None
+
+        # Priorité 1 : dossier bert_*_model_tokenizer/
+        if tokenizer_folder:
+            tokenizer_path = os.path.join(MODELS_DIR, tokenizer_folder)
+            if os.path.isdir(tokenizer_path):
+                print(f"  ↻ Tokenizer chargé depuis : {tokenizer_folder}/")
+            else:
+                tokenizer_path = None
+        else:
+            tokenizer_path = None
+
+        # Priorité 2 : convention _tokenizer (ex: model_bert_rating_tokenizer/)
+        if tokenizer_path is None:
+            fallback = os.path.join(MODELS_DIR, f"{model_name}_tokenizer")
+            if os.path.isdir(fallback):
+                tokenizer_path = fallback
+                print(f"  ↻ Tokenizer chargé depuis : {model_name}_tokenizer/")
+
+        # Priorité 3 : même dossier que le modèle
+        if tokenizer_path is None:
+            tokenizer_path = path
+            print(f"  ↻ Tokenizer chargé depuis le dossier du modèle.")
+
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
         return (model, tokenizer), "bert"
 
     raise ValueError(f"Format de modèle non reconnu : {model_name}")

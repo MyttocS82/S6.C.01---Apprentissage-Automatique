@@ -1,0 +1,71 @@
+from tensorflow.keras.layers import TextVectorization, Embedding, Dense, Dropout, GlobalMaxPooling1D, Conv1D
+from sklearn.model_selection import train_test_split
+from src.data.load_data import load_ml_datasets
+from pathlib import Path
+import tensorflow as tf
+
+ML_DATA_FOLDER = Path("../../../data/ml")
+MODELS_FOLDER = Path("../../../models")
+
+VOCAB_SIZE = 25000
+MAX_LEN = 250
+
+
+def custom_standardization(input_string):
+    text = tf.strings.lower(input_string)
+    text = tf.strings.regex_replace(text, r"[^\w\s]", "")
+    return text
+
+
+def train_cnn_sentiment(print_eval: bool = False):
+    df = load_ml_datasets(ML_DATA_FOLDER, "ml_reviews_sentiment.csv")
+
+    X = df["text"].values
+    y = df["sentiment"].values + 1  # Ajout de 1 pour que les classes soient 0, 1, 2 au lieu de -1, 0, 1
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42, stratify=y
+    )
+
+    vectorizer = TextVectorization(
+        max_tokens=VOCAB_SIZE,
+        output_mode="int",
+        output_sequence_length=MAX_LEN,
+        standardize=custom_standardization
+    )
+    vectorizer.adapt(X_train)
+
+    model = tf.keras.Sequential([
+        vectorizer,
+        Embedding(VOCAB_SIZE, 64),
+        Conv1D(kernel_size=(5,), filters=64, activation="relu"),
+        GlobalMaxPooling1D(),
+        Dense(32, activation="relu"),
+        Dropout(0.25),
+        Dense(3, activation="softmax")
+    ])
+
+    model.compile(
+        optimizer="adam",
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"]
+    )
+
+    model.fit(
+        X_train,
+        y_train,
+        epochs=5,
+        batch_size=1024,
+        validation_split=0.1,
+        verbose=print_eval  # Pour afficher ou non les détails de l'entraînement (perte, précision, etc.)
+    )
+
+    model.save(MODELS_FOLDER / "model_cnn_sentiment.keras")
+
+    if print_eval:
+        print("\nCNN sentiment predictions :")
+        model.evaluate(X_test, y_test)
+
+
+if __name__ == "__main__":
+    train_cnn_sentiment(print_eval=False)

@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 
-def load_yelp_datasets(path_directory: Path) -> tuple[DataFrame, DataFrame, DataFrame]:
+def load_yelp_datasets(path_directory: Path) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     """
     Load raw Yelp datasets from the specified directory.
     :param path_directory:
@@ -11,11 +11,13 @@ def load_yelp_datasets(path_directory: Path) -> tuple[DataFrame, DataFrame, Data
         1. business_dataset
         2. user_dataset
         3. reviews_dataset
+        4. test_dataset
     Raises FileNotFoundError if any of the required files are missing.
     """
     business_dataset = None
     user_dataset = None
     reviews_dataset = None
+    test_dataset = None
 
     for file in path_directory.iterdir():
         if file.name == "yelp_academic_dataset_business.json":
@@ -27,10 +29,13 @@ def load_yelp_datasets(path_directory: Path) -> tuple[DataFrame, DataFrame, Data
         elif file.name == "yelp_academic_reviews4students.jsonl":
             reviews_dataset = pd.read_json(file, lines=True)
 
-    if business_dataset is None or user_dataset is None or reviews_dataset is None:
+        elif file.name == 'Test_file_SAE.json':
+            test_dataset = pd.read_json(file, lines=True)
+
+    if business_dataset is None or user_dataset is None or reviews_dataset is None or test_dataset is None:
         raise FileNotFoundError("One or more required Yelp dataset files are missing.")
 
-    return business_dataset, user_dataset, reviews_dataset
+    return business_dataset, user_dataset, reviews_dataset, test_dataset
 
 
 def write_dataframe_to_csv(dataframe: DataFrame, output_path: Path, filename: str) -> None:
@@ -88,3 +93,22 @@ def load_ml_datasets(path_directory: Path, filename: str) -> DataFrame:
         raise FileNotFoundError(f"The required machine learning dataset file '{filename}' is missing.")
 
     return ml_dataset
+
+
+def load_test_data(path_directory: Path, filename: str) -> DataFrame:
+    """
+    Load test file
+    :param path_directory:
+    :param filename:
+    :return:
+    """
+    test_dataset = None
+
+    for file in path_directory.iterdir():
+        if file.name == filename:
+            test_dataset = pd.read_csv(file)
+
+    if test_dataset is None:
+        raise FileNotFoundError("One or more required test dataset files are missing.")
+
+    return test_dataset

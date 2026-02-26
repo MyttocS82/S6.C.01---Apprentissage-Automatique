@@ -200,11 +200,23 @@ def predict_keras(model, texts: list[str]):
     return np.argmax(probabilities, axis=1) + 1
 
 
-def predict_bert(model_tok, texts: list[str]):
+def predict_bert(model_tok, texts: list[str], batch_size: int = 1024):
     model, tokenizer = model_tok
-    enc = tokenizer(texts, truncation=True, padding=True, max_length=128, return_tensors="tf")
-    logits = model(enc).logits.numpy()
-    return np.argmax(logits, axis=1)
+    predictions = []
+
+    # Process texts in batches
+    for i in range(0, len(texts), batch_size):
+        batch_texts = texts[i:i + batch_size]
+        enc = tokenizer(batch_texts, truncation=True, padding=True, max_length=128, return_tensors="tf")
+
+        # Get logits for the batch
+        logits = model(enc).logits.numpy()
+
+        # Get the predicted class for each item in the batch
+        batch_predictions = np.argmax(logits, axis=1)
+        predictions.extend(batch_predictions)  # Append batch predictions to the final list
+
+    return np.array(predictions)
 
 
 def decode_predictions(predictions, model_name: str) -> list:

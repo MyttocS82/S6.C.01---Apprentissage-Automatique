@@ -14,7 +14,7 @@ def preprocess_datasets():
     :return: None
     """
     # Loading raw datasets
-    business, users, reviews = load_yelp_datasets(RAW_DATA_FOLDER)
+    business, users, reviews, test = load_yelp_datasets(RAW_DATA_FOLDER)
 
     """
     Preprocessing des datasets brutes en datasets légèrement pré-traités
@@ -42,18 +42,21 @@ def preprocess_datasets():
     # Drop les colonnes inutiles
     users = users.drop(columns=['name', 'elite', 'friends', 'yelping_since'] + compliment_columns)
 
-    ''' Preprocessing Reviews DataFrame '''
+    ''' Preprocessing Reviews DataFrame  '''
     # Drop les colonnes inutiles
     reviews = reviews.drop(columns=['date'])
+    test = test.drop(columns=['date'])
 
     # Création des labels pour le sentiment : score > 3 → positif // score < 3 → négatif // score = 3 → neutre
     #   et création d'une colonne 'rating' (eq à stars)
     create_sentiment_and_rating_columns(reviews)
+    create_sentiment_and_rating_columns(test)
 
     ''' Écriture des DataFrames préprocessés dans des fichiers CSV '''
     write_dataframe_to_csv(business, PROCESSED_DATA_FOLDER, 'processed_business.csv')
     write_dataframe_to_csv(users, PROCESSED_DATA_FOLDER, 'processed_users.csv')
     write_dataframe_to_csv(reviews, PROCESSED_DATA_FOLDER, 'processed_reviews.csv')
+    write_dataframe_to_csv(test, PROCESSED_DATA_FOLDER, 'test_dataset.csv')
 
 
 def ml_datasets():
@@ -63,17 +66,27 @@ def ml_datasets():
     """
     # Loading processed datasets
     processed_reviews = load_processed_datasets(PROCESSED_DATA_FOLDER, "processed_reviews.csv")
+    processed_test = load_processed_datasets(PROCESSED_DATA_FOLDER, 'test_dataset.csv')
 
     ''' Dataset reviews pour le Machine Learning '''
     processed_reviews.drop(columns=['business_id', 'review_id', 'user_id', 'stars', 'useful',
                                     'funny', 'cool'], inplace=True)
 
+    processed_test.drop(columns=['business_id', 'review_id', 'user_id', 'stars', 'useful', 'funny', 'cool'],
+                        inplace=True)
+
     dataset_sentiment = processed_reviews.copy().drop(columns=['rating'])
     dataset_rating = processed_reviews.copy().drop(columns=['sentiment'])
+
+    test_sentiment = processed_test.copy().drop(columns=['rating'])
+    test_rating = processed_test.copy().drop(columns=['sentiment'])
 
     ''' Écriture des DataFrames pour le ML dans des fichiers CSV '''
     write_dataframe_to_csv(dataset_sentiment, ML_DATA_FOLDER, 'ml_reviews_sentiment.csv')
     write_dataframe_to_csv(dataset_rating, ML_DATA_FOLDER, 'ml_reviews_rating.csv')
+
+    write_dataframe_to_csv(test_sentiment, ML_DATA_FOLDER, 'ml_test_sentiment.csv')
+    write_dataframe_to_csv(test_rating, ML_DATA_FOLDER, 'ml_test_rating.csv')
 
 
 if __name__ == "__main__":
